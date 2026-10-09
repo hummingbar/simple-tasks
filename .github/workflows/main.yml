@@ -44,10 +44,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y rclone
-          mkdir -p ~/.config/rclone
-          sudo mkdir /mnt/sto-3
-          wget -O ~/.config/rclone/rclone.conf ${{ secrets.RCLONE_URL }}
-          # sudo rclone mount sto-3: /mnt/sto-3 --allow-other --daemon
+          sudo mkdir -p /root/.config/rclone
+          sudo wget -O /root/.config/rclone/rclone.conf ${{ secrets.RCLONE_URL }}
           curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up --auth-key=${{ secrets.TS_KEY }}
           sudo tailscale up --ssh --hostname=hummingbar-gh
           sleep infinity
