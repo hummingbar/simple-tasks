@@ -1,0 +1,56 @@
+name: Run Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      maximize_build_space:
+        description: 'Free up space on the GitHub runner (default: no)'
+        required: false
+        default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
+
+jobs:
+  run-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Maximize build space
+        if: ${{ github.event.inputs.maximize_build_space == 'yes' }}
+        uses: AdityaGarg8/remove-unwanted-software@v5
+        with:
+          remove-android: 'true'
+          remove-dotnet: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+          remove-large-packages: 'true'
+          remove-cached-tools: 'true'
+          remove-swapfile: 'true'
+    
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # - name: Log in to Docker registry
+      #   uses: docker/login-action@v4
+      #   with:
+      #     registry: docker.io
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Running my stuff
+        run: |
+          sudo apt update
+          sudo apt install -y rclone
+          mkdir -p ~/.config/rclone
+          sudo mkdir /mnt/sto-3
+          wget -O ~/.config/rclone/rclone.conf ${{ secrets.RCLONE_URL }}
+          # sudo rclone mount sto-3: /mnt/sto-3 --allow-other --daemon
+          curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up --auth-key=${{ secrets.TS_KEY }}
+          sudo tailscale up --ssh --hostname=hummingbar-gh
+          sleep infinity
+          
+          
+
